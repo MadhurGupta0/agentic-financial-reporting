@@ -151,9 +151,9 @@ Tier 3 output goes to `pending_mapping` quarantine. It is never applied automati
 **Unmapped accounts block statement release.** They do not get a "Other / Unclassified" bucket, because that bucket is how a balance sheet silently becomes wrong.
 
 ### S4 — Adjustment validation
-Line level: account exists; account is a posting account; amount is single-sided, non-zero, non-negative; date falls in the open period; currency is known.
+Line level: account exists; account is a posting account; amount is single-sided, non-zero, non-negative; date falls in the open period. If line-level currency were introduced in this slice, it would be validated deterministically rather than inferred.
 Entry level: debits equal credits within tolerance; same-account debit-and-credit patterns flagged; duplicate entry keys detected; IC entries checked for circularity.
-Outcome per entry: `ACCEPT` / `REJECT` / `ESCALATE`. Rejected and escalated entries are excluded from downstream figures entirely — no partial posting.
+Outcome per entry: `ACCEPT` / `REJECT` / `ESCALATE`. Rejected and escalated entries are excluded from downstream figures entirely — no partial posting. In the prototype slice, accepted entries are then replayed into the functional-currency TB and rechecked for post-adjustment balance as a release-readiness control.
 
 ### S5 — FX
 Translate non-functional balances using policy-specified rates: period-end (closing) for balance sheet monetary items, period-average for P&L, historic for equity. Compute revaluation differences explicitly rather than plugging them.
@@ -369,7 +369,7 @@ The delta is one adjustment, named, with its approver, its source reference, and
 
 **State model.** Records live in exactly one of: `raw` (ingested, untouched) → `validated` → `quarantined` (awaiting human) → `approved` → `posted`. Transitions are append-only and carry actor identity plus timestamp. Nothing moves backwards; a correction creates a new record referencing the old one.
 
-**Idempotency.** For a fixed `(input bundle hash, approved mapping set, policy version, validator version)`, the pipeline produces byte-identical decisions and identical lineage structure. This is testable and should be a CI test, not an aspiration.
+**Idempotency.** For a fixed `(input bundle hash, approved mapping set, policy version, validator version)`, the deterministic decision payload produces byte-identical decisions and identical lineage structure. Volatile run metadata such as execution timestamp is stored separately from the decision block. This is testable and should be a CI test, not an aspiration.
 
 **Reproducibility.** Any historical run can be replayed from its ledger entry: same inputs by hash, same policy version, same code version. If a replay diverges, that is itself a P0 defect.
 

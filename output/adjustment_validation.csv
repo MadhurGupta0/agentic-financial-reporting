@@ -1,11 +1,11 @@
 id,status,reasons
-JE-001,ACCEPT,
-JE-002,REJECT,debits and credits differ by 3500.00
-JE-003,ACCEPT,
-JE-004,ACCEPT,
-JE-005,REJECT,line 1: account 6315 is missing from chart of accounts
-JE-006,ACCEPT,
-JE-007,ACCEPT,
-JE-008,ESCALATE,entry uses intercompany account 2170 on both debit and credit sides; finance review required
-JE-009,ACCEPT,
-JE-010,ACCEPT,
+JE-001,ACCEPT,"Accepted. The entry passed all deterministic validation checks for account validity, period, and balance."
+JE-002,REJECT,Rejected. Finance review is needed before posting because debits and credits differ by 3500.00.
+JE-003,ACCEPT,"Accepted. The entry passed all deterministic validation checks for account validity, period, and balance."
+JE-004,ACCEPT,"Accepted. The entry passed all deterministic validation checks for account validity, period, and balance."
+JE-005,REJECT,Rejected. Finance review is needed before posting because line 1: account 6315 is missing from chart of accounts.
+JE-006,ACCEPT,"Accepted. The entry passed all deterministic validation checks for account validity, period, and balance."
+JE-007,ACCEPT,"Accepted. The entry passed all deterministic validation checks for account validity, period, and balance."
+JE-008,ESCALATE,"Escalated. The entry is balanced, but finance review is required because entry uses intercompany account 2170 on both debit and credit sides; finance review required."
+JE-009,ACCEPT,"Accepted. The entry passed all deterministic validation checks for account validity, period, and balance."
+JE-010,ACCEPT,"Accepted. The entry passed all deterministic validation checks for account validity, period, and balance."
