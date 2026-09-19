@@ -11,6 +11,7 @@ This workspace contains a validation-first prototype for the supplied messy acco
 
 - `architecture.md` — full-system design, agent topology, controls, and audit model
 - `prototype.py` — working prototype for the chosen slice
+- `test_prototype.py` — focused unit tests for idempotency, adversarial validation cases, and post-adjustment control checks
 - `reflection.md` — tradeoffs, scale limits, AI-tool usage, and underestimated risk
 - `clarifying_questions.md` — accounting questions I would raise before starting
 - `output/` — generated prototype artifacts
@@ -26,6 +27,20 @@ python .\prototype.py
 ```bash
 python prototype.py
 ```
+
+## Test
+
+From the workspace root:
+
+```powershell
+python -m unittest test_prototype.py
+```
+
+```bash
+python -m unittest test_prototype.py
+```
+
+The test file covers deterministic idempotency, malformed amounts, header-account posting rejection, out-of-period dates, duplicate or missing journal ids, and post-adjustment TB release-readiness controls.
 
 The command reads every file under `inputs/` and writes:
 
