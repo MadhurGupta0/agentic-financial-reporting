@@ -1,0 +1,11 @@
+id,status,reasons
+JE-001,ACCEPT,
+JE-002,REJECT,debits and credits differ by 3500.00
+JE-003,ACCEPT,
+JE-004,ACCEPT,
+JE-005,REJECT,line 1: account 6315 is missing from chart of accounts
+JE-006,ACCEPT,
+JE-007,ACCEPT,
+JE-008,ESCALATE,entry uses intercompany account 2170 on both debit and credit sides; finance review required
+JE-009,ACCEPT,
+JE-010,ACCEPT,

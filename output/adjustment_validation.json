@@ -1,0 +1,451 @@
+{
+  "prototype": "manual-adjustment-validator",
+  "run_metadata": {
+    "run_at_utc": "2026-09-19T09:35:46.087527+00:00",
+    "validation_version": "2.0"
+  },
+  "period": "2024-Q4",
+  "functional_currency": "USD",
+  "source_files": [
+    {
+      "path": "inputs/chart_of_accounts.csv",
+      "sha256": "093275cdd8513d915d42a63262a96e38177129d95f65de4cadd2dab58bdf6033"
+    },
+    {
+      "path": "inputs/trial_balance.csv",
+      "sha256": "c1f121388aa85a77d737339e25b8e6e6798498e018657fb85e024200f4a44555"
+    },
+    {
+      "path": "inputs/prior_period_tb.csv",
+      "sha256": "3b81c410569480e623130ee794125f8fd306967ee7cb3e7f286635f9eccc6446"
+    },
+    {
+      "path": "inputs/fx_rates.csv",
+      "sha256": "93aca603be3c63ce1f41e4a26b93073902af406eef9318e40ca279552e67e5eb"
+    },
+    {
+      "path": "inputs/manual_adjustments.json",
+      "sha256": "26fcad0c0c7bda5306efea47e0c73238b2828b5d30afdd1bb0d54bb6a6704a0f"
+    }
+  ],
+  "decision_policy": {
+    "accept_only_when": [
+      "all accounts exist in the COA and are posting accounts",
+      "all lines have non-negative, single-sided amounts",
+      "all lines have a non-zero posting amount",
+      "debits equal credits within 0.01 USD",
+      "entry date is inside 2024-Q4"
+    ],
+    "escalate_when": [
+      "an entry is balanced but suspicious or ambiguous",
+      "the same account appears on both debit and credit sides",
+      "an intercompany account appears on both sides and needs finance review"
+    ],
+    "ambiguous_or_failed_entries": "reject or escalate for finance review; do not auto-post"
+  },
+  "summary": {
+    "entries": 10,
+    "accepted": 7,
+    "escalated": 1,
+    "rejected": 2
+  },
+  "source_controls": {
+    "trial_balance": {
+      "row_count": 62,
+      "debit_total": "71072200.00",
+      "credit_total": "71077000.00",
+      "difference": "-4800.00",
+      "is_balanced": false,
+      "unmapped_accounts": [
+        "9999"
+      ],
+      "duplicate_account_currency_keys": [
+        {
+          "account_code": "6310",
+          "currency": "USD",
+          "count": 2
+        }
+      ]
+    },
+    "prior_period": {
+      "row_count": 33,
+      "accounts_not_in_current_tb": [
+        "6905"
+      ]
+    },
+    "fx": {
+      "tb_currencies": [
+        "EUR",
+        "GBP",
+        "USD"
+      ],
+      "period_end_currencies": [
+        "EUR",
+        "USD"
+      ],
+      "missing_period_end_rates": [
+        "GBP"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "id": "JE-001",
+      "status": "ACCEPT",
+      "description": "Accrue Q4 bonus pool",
+      "source": "Finance team \u2014 bonus accrual workbook v3",
+      "date": "2024-12-31",
+      "debit_total": "850000.00",
+      "credit_total": "850000.00",
+      "difference": "0.00",
+      "accounts": [
+        "2120",
+        "6100"
+      ],
+      "errors": [],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "6100",
+          "debit": "850000.00",
+          "credit": "0.00",
+          "memo": "Bonus accrual",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "2120",
+          "debit": "0.00",
+          "credit": "850000.00",
+          "memo": "Accrual offset",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-002",
+      "status": "REJECT",
+      "description": "Reclassify marketing spend wrongly booked to T&E",
+      "source": "Controller note 2024-12-28",
+      "date": "2024-12-28",
+      "debit_total": "28500.00",
+      "credit_total": "25000.00",
+      "difference": "3500.00",
+      "accounts": [
+        "6300",
+        "6310"
+      ],
+      "errors": [
+        {
+          "code": "OUT_OF_BALANCE",
+          "message": "debits and credits differ by 3500.00"
+        }
+      ],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "6300",
+          "debit": "28500.00",
+          "credit": "0.00",
+          "memo": "Move from T&E",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "6310",
+          "debit": "0.00",
+          "credit": "25000.00",
+          "memo": "Reverse from T&E",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-003",
+      "status": "ACCEPT",
+      "description": "FX revaluation of EUR cash balance to period-end rate",
+      "source": "FX reval calc",
+      "date": "2024-12-31",
+      "debit_total": "11200.00",
+      "credit_total": "11200.00",
+      "difference": "0.00",
+      "accounts": [
+        "1110",
+        "7310"
+      ],
+      "errors": [],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "1110",
+          "debit": "11200.00",
+          "credit": "0.00",
+          "memo": "EUR cash uplift",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "7310",
+          "debit": "0.00",
+          "credit": "11200.00",
+          "memo": "Unrealized FX gain",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-004",
+      "status": "ACCEPT",
+      "description": "Bad debt provision top-up",
+      "source": "AR aging review",
+      "date": "2024-12-31",
+      "debit_total": "45000.00",
+      "credit_total": "45000.00",
+      "difference": "0.00",
+      "accounts": [
+        "1121",
+        "6600"
+      ],
+      "errors": [],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "6600",
+          "debit": "45000.00",
+          "credit": "0.00",
+          "memo": "Top-up reserve",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "1121",
+          "debit": "0.00",
+          "credit": "45000.00",
+          "memo": "Increase allowance",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-005",
+      "status": "REJECT",
+      "description": "Reclass conference travel from old code",
+      "source": "AP team",
+      "date": "2024-12-15",
+      "debit_total": "18500.00",
+      "credit_total": "18500.00",
+      "difference": "0.00",
+      "accounts": [
+        "6310"
+      ],
+      "errors": [
+        {
+          "code": "MISSING_COA_ACCOUNT",
+          "message": "line 1: account 6315 is missing from chart of accounts"
+        }
+      ],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "6315",
+          "debit": "18500.00",
+          "credit": "0.00",
+          "memo": "Conf travel",
+          "errors": [
+            {
+              "code": "MISSING_COA_ACCOUNT",
+              "message": "line 1: account 6315 is missing from chart of accounts"
+            }
+          ]
+        },
+        {
+          "line_number": 2,
+          "account": "6310",
+          "debit": "0.00",
+          "credit": "18500.00",
+          "memo": "Out of T&E",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-006",
+      "status": "ACCEPT",
+      "description": "Depreciation catch-up \u2014 Q4",
+      "source": "Fixed asset register",
+      "date": "2024-12-31",
+      "debit_total": "215000.00",
+      "credit_total": "215000.00",
+      "difference": "0.00",
+      "accounts": [
+        "1211",
+        "6500"
+      ],
+      "errors": [],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "6500",
+          "debit": "215000.00",
+          "credit": "0.00",
+          "memo": "Q4 dep",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "1211",
+          "debit": "0.00",
+          "credit": "215000.00",
+          "memo": "Accum dep",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-007",
+      "status": "ACCEPT",
+      "description": "Deferred tax true-up",
+      "source": "Tax provision memo",
+      "date": "2024-12-31",
+      "debit_total": "38000.00",
+      "credit_total": "38000.00",
+      "difference": "0.00",
+      "accounts": [
+        "1250",
+        "8200"
+      ],
+      "errors": [],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "8200",
+          "debit": "38000.00",
+          "credit": "0.00",
+          "memo": "DTA reduction",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "1250",
+          "debit": "0.00",
+          "credit": "38000.00",
+          "memo": "Reduce DTA",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-008",
+      "status": "ESCALATE",
+      "description": "Intercompany settlement \u2014 UK sub",
+      "source": "IC reconciliation",
+      "date": "2024-12-30",
+      "debit_total": "320000.00",
+      "credit_total": "320000.00",
+      "difference": "0.00",
+      "accounts": [
+        "2170"
+      ],
+      "errors": [],
+      "warnings": [
+        {
+          "code": "CIRCULAR_INTERCOMPANY",
+          "message": "entry uses intercompany account 2170 on both debit and credit sides; finance review required"
+        }
+      ],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "2170",
+          "debit": "320000.00",
+          "credit": "0.00",
+          "memo": "IC payable down",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "2170",
+          "debit": "0.00",
+          "credit": "320000.00",
+          "memo": "IC payable up",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-009",
+      "status": "ACCEPT",
+      "description": "Accrue legal fees for ongoing litigation",
+      "source": "Legal memo dated 2024-12-29",
+      "date": "2024-12-31",
+      "debit_total": "75000.00",
+      "credit_total": "75000.00",
+      "difference": "0.00",
+      "accounts": [
+        "2120",
+        "6400"
+      ],
+      "errors": [],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "6400",
+          "debit": "75000.00",
+          "credit": "0.00",
+          "memo": "Legal accrual",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "2120",
+          "debit": "0.00",
+          "credit": "75000.00",
+          "memo": "Accrued legal",
+          "errors": []
+        }
+      ]
+    },
+    {
+      "id": "JE-010",
+      "status": "ACCEPT",
+      "description": "Reclass long-term debt current portion",
+      "source": "Treasury schedule",
+      "date": "2024-12-31",
+      "debit_total": "200000.00",
+      "credit_total": "200000.00",
+      "difference": "0.00",
+      "accounts": [
+        "2140",
+        "2210"
+      ],
+      "errors": [],
+      "warnings": [],
+      "line_results": [
+        {
+          "line_number": 1,
+          "account": "2210",
+          "debit": "200000.00",
+          "credit": "0.00",
+          "memo": "Out of LT debt",
+          "errors": []
+        },
+        {
+          "line_number": 2,
+          "account": "2140",
+          "debit": "0.00",
+          "credit": "200000.00",
+          "memo": "Into current",
+          "errors": []
+        }
+      ]
+    }
+  ]
+}
